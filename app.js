@@ -2,6 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const { studentrouter } = require("./STUDENT/studentrouter");
 const { bookrouter } = require("./BOOK/bookrouter");
+const { adminrouter } = require("./ADMINROUTER/adminrouter");
+const { login } = require("./LOGIN/login");
+const lodash = require("lodash");
 const knex = require("knex");
 
 const db = knex({
@@ -21,34 +24,34 @@ app.use(cors());
 
 app.use("/student", studentrouter);
 app.use("/book", bookrouter);
+app.use("/admin", adminrouter);
+app.use("/login", login);
 
-app.get("/test", (req, res) => {
-  // db.transaction((t) => {
-  //   t.insert({
-  //     b: '["hot", "cold"]',
-  //     bookname: "aaa",
-  //     author: "aaa",
-  //   })
-  //     .into("books")
-  //     .returning("*")
-  //     .then((data) => {
-  //       res.json(data);
-  //     })
-  //     .then(t.commit);
-  // });
-  // db.select("author")
-  //   .from("books")
-  //   .where("bookname", "=", "Sherlock Holmes")
-  //   .returning("author")
-  //   .then((data) => {
-  //     res.json(data);
-  //   });
-  db.select("*")
-    .from("students")
-    .returning("*")
-    .then((data) => {
-      res.json(data);
-    });
+app.get("/test", async (req, res) => {
+  const data = await db
+    .select("*")
+    .from("booksborrowed")
+    .where("student_id", "=", 100)
+    .join("books", "books.bookid", "booksborrowed.book_id")
+    .join("students", "students.studentid", "student_id");
+  const result = [];
+  for (let i = 0; i < data.length; i++) {
+    result.push(lodash.omit(data[i], "count"));
+  }
+  // console.log(result);
+  // const returndata = [];
+  // for (let i = 0; i < data.length; i++) {
+  //   if (data[i].return_date < new Date()) {
+  //     Object.assign(
+  //       data[i],
+  //       { borrow_date: data[i].borrow_date.toLocaleDateString() },
+  //       { return_date: data[i].return_date.toLocaleDateString() }
+  //     );
+
+  //     returndata.push(data[i]);
+  //   }
+  // }
+  res.json(result);
 });
 
 module.exports = { app };
