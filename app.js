@@ -38,19 +38,7 @@ app.get("/test", async (req, res) => {
   for (let i = 0; i < data.length; i++) {
     result.push(lodash.omit(data[i], "count"));
   }
-  // console.log(result);
-  // const returndata = [];
-  // for (let i = 0; i < data.length; i++) {
-  //   if (data[i].return_date < new Date()) {
-  //     Object.assign(
-  //       data[i],
-  //       { borrow_date: data[i].borrow_date.toLocaleDateString() },
-  //       { return_date: data[i].return_date.toLocaleDateString() }
-  //     );
 
-  //     returndata.push(data[i]);
-  //   }
-  // }
   res.json(result);
 });
 
